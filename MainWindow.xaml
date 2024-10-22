@@ -16,38 +16,38 @@
         </Grid.ColumnDefinitions>
 
         <!-- Left side: Encryption and Decryption section -->
-        <StackPanel Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20" Padding="10" Width="300">
+        <StackPanel Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="15" Padding="10" Width="300">
             <!-- Encryption Section -->
             <TextBlock Text="🔒 Encryption" FontSize="20" FontWeight="Bold" Foreground="#D3CCE3" TextAlignment="Center" />
             <!-- SplitButton for Encryption -->
-            <SplitButton Content="Encrypt Image" Width="200" Background="#B56576" Foreground="White" HorizontalAlignment="Center"
+            <SplitButton Content="Select Image" Width="200" Background="#B56576" Foreground="White" HorizontalAlignment="Center"
                          Click="SelectImageButton_Click">
                 <SplitButton.Flyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem Text="Encrypt Image" Click="SelectImageFlyout_Click"/>
-                        <MenuFlyoutItem Text="Encrypt Folder" Click="SelectDirectoryFlyout_Click"/>
+                        <MenuFlyoutItem Text="Select Image" Click="SelectImageFlyout_Click"/>
+                        <MenuFlyoutItem Text="Select Folder" Click="SelectDirectoryFlyout_Click"/>
                     </MenuFlyout>
                 </SplitButton.Flyout>
             </SplitButton>
-            <PasswordBox x:Name="PasswordBoxEncrypt" PlaceholderText="Enter a strong password" Width="200" ToolTipService.ToolTip="Enter a secure password for encryption."
+            <PasswordBox x:Name="PasswordBoxEncrypt" PlaceholderText="Enter Password" Width="200" ToolTipService.ToolTip="Enter a secure password for encryption."
                      HorizontalAlignment="Center" />
-            <Button Content="Encrypt Image/s" Click="HandleEncryption_Click" Width="200" Background="#B56576" Foreground="White"
+            <Button Content="Encrypt Image/s" Click="OnEncryptButton_Click" Width="200" Background="#B56576" Foreground="White"
                 ToolTipService.ToolTip="Encrypt the selected image using the password." HorizontalAlignment="Center" />
 
             <!-- Decryption Section -->
             <TextBlock Text="🔓 Decryption" FontSize="20" FontWeight="Bold" Foreground="#D3CCE3" TextAlignment="Center" Margin="20,30,20,0" />
-            <SplitButton Content="Decrypt Image" Width="200" Background="#B56576" Foreground="White" HorizontalAlignment="Center"
+            <SplitButton Content="Select Image" Width="200" Background="#B56576" Foreground="White" HorizontalAlignment="Center"
                          Click="SelectArtifactButton_Click">
                 <SplitButton.Flyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem Text="Decrypt Image" Click="SelectArtifactFlyout_Click"/>
-                        <MenuFlyoutItem Text="Decrypt Folder" Click="SelectArchiveFlyout_Click"/>
+                        <MenuFlyoutItem Text="Select Image" Click="SelectArtifactFlyout_Click"/>
+                        <MenuFlyoutItem Text="Select Folder" Click="SelectArchiveFlyout_Click"/>
                     </MenuFlyout>
                 </SplitButton.Flyout>
             </SplitButton>
-            <PasswordBox x:Name="PasswordBoxDecrypt" PlaceholderText="Enter decryption password" Width="200" ToolTipService.ToolTip="Enter the password used during encryption."
+            <PasswordBox x:Name="PasswordBoxDecrypt" PlaceholderText="Enter Password" Width="200" ToolTipService.ToolTip="Enter the password used during encryption."
                      HorizontalAlignment="Center" />
-            <Button Content="Decrypt Image/s" Click="HandleDecryption_Click" Width="200" Background="#B56576" Foreground="White"
+            <Button Content="Decrypt Image/s" Click="OnDecryptButton_Click" Width="200" Background="#B56576" Foreground="White"
                 ToolTipService.ToolTip="Decrypt the selected image file." HorizontalAlignment="Center" />
         </StackPanel>
 
@@ -68,7 +68,7 @@
                        Stretch="Uniform" 
                        HorizontalAlignment="Center" 
                        VerticalAlignment="Center" />
-                    
+
                     <!-- Previous Button on the left side -->
                     <Button x:Name="PreviousButton"
                             Content="❮"
@@ -81,7 +81,7 @@
                             Opacity="0"
                             PointerEntered="OnPointerEnteredButton"
                             PointerExited="OnPointerExitedButton"/>
-                    
+
                     <!-- Next Button on the right side -->
                     <Button x:Name="NextButton"
                             Content="❯"
@@ -94,6 +94,7 @@
                             Opacity="0"
                             PointerEntered="OnPointerEnteredButton"
                             PointerExited="OnPointerExitedButton"/>
+
                 </Grid>
             </Border>
 
