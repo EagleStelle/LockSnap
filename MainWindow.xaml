@@ -1,0 +1,104 @@
+<Window
+    x:Class="LockSnap.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:LockSnap"
+    Title="LockSnap">
+
+    <Grid Background="#1F1A30">
+        <!-- Two-column layout: Left for encryption/decryption, Right for image viewer -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <!-- Left side (auto-sized for content) -->
+            <ColumnDefinition Width="*" />
+            <!-- Right side for image viewer (takes all remaining space) -->
+        </Grid.ColumnDefinitions>
+
+        <!-- Left side: Encryption and Decryption section -->
+        <StackPanel Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20" Padding="10" Width="300">
+            <!-- Encryption Section -->
+            <TextBlock Text="🔒 Encryption" FontSize="20" FontWeight="Bold" Foreground="#D3CCE3" TextAlignment="Center" />
+            <!-- SplitButton for Encryption -->
+            <SplitButton Content="Encrypt Image" Width="200" Background="#B56576" Foreground="White" HorizontalAlignment="Center"
+                         Click="SelectImageButton_Click">
+                <SplitButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Encrypt Image" Click="SelectImageFlyout_Click"/>
+                        <MenuFlyoutItem Text="Encrypt Folder" Click="SelectDirectoryFlyout_Click"/>
+                    </MenuFlyout>
+                </SplitButton.Flyout>
+            </SplitButton>
+            <PasswordBox x:Name="PasswordBoxEncrypt" PlaceholderText="Enter a strong password" Width="200" ToolTipService.ToolTip="Enter a secure password for encryption."
+                     HorizontalAlignment="Center" />
+            <Button Content="Encrypt Image/s" Click="HandleEncryption_Click" Width="200" Background="#B56576" Foreground="White"
+                ToolTipService.ToolTip="Encrypt the selected image using the password." HorizontalAlignment="Center" />
+
+            <!-- Decryption Section -->
+            <TextBlock Text="🔓 Decryption" FontSize="20" FontWeight="Bold" Foreground="#D3CCE3" TextAlignment="Center" Margin="20,30,20,0" />
+            <SplitButton Content="Decrypt Image" Width="200" Background="#B56576" Foreground="White" HorizontalAlignment="Center"
+                         Click="SelectArtifactButton_Click">
+                <SplitButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Decrypt Image" Click="SelectArtifactFlyout_Click"/>
+                        <MenuFlyoutItem Text="Decrypt Folder" Click="SelectArchiveFlyout_Click"/>
+                    </MenuFlyout>
+                </SplitButton.Flyout>
+            </SplitButton>
+            <PasswordBox x:Name="PasswordBoxDecrypt" PlaceholderText="Enter decryption password" Width="200" ToolTipService.ToolTip="Enter the password used during encryption."
+                     HorizontalAlignment="Center" />
+            <Button Content="Decrypt Image/s" Click="HandleDecryption_Click" Width="200" Background="#B56576" Foreground="White"
+                ToolTipService.ToolTip="Decrypt the selected image file." HorizontalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Right side: Image viewer section -->
+        <Grid Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="15">
+            <!-- Define rows for the title, image, and message box -->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <!-- Image stretches to fill available space -->
+                <RowDefinition Height="Auto" />
+                <!-- Message box takes only needed space -->
+            </Grid.RowDefinitions>
+
+            <!-- Image display with background color and proper stretch -->
+            <Border Grid.Row="0" Background="#2B1B32">
+                <Grid>
+                    <Image x:Name="DecryptedImageControl" 
+                       Stretch="Uniform" 
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="Center" />
+                    
+                    <!-- Previous Button on the left side -->
+                    <Button x:Name="PreviousButton"
+                            Content="❮"
+                            FontSize="38"
+                            Width="100"
+                            VerticalAlignment="Stretch"
+                            HorizontalAlignment="Left"
+                            Click="PreviousImage_Click"
+                            Foreground="#B56576"
+                            Opacity="0"
+                            PointerEntered="OnPointerEnteredButton"
+                            PointerExited="OnPointerExitedButton"/>
+                    
+                    <!-- Next Button on the right side -->
+                    <Button x:Name="NextButton"
+                            Content="❯"
+                            FontSize="38"
+                            Width="100"
+                            VerticalAlignment="Stretch"
+                            HorizontalAlignment="Right"
+                            Click="NextImage_Click"
+                            Foreground="#B56576"
+                            Opacity="0"
+                            PointerEntered="OnPointerEnteredButton"
+                            PointerExited="OnPointerExitedButton"/>
+                </Grid>
+            </Border>
+
+            <!-- Combined message box for encryption and decryption statuses -->
+            <TextBlock Grid.Row="1" x:Name="MessageTextBlock" Text="" Foreground="#FF6F61" TextAlignment="Center" FontSize="14" FontWeight="SemiBold" Margin="20,10,20,0" />
+        </Grid>
+    </Grid>
+</Window>

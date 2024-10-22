@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "LockSnap (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "LockSnap (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
