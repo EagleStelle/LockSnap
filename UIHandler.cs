@@ -9,16 +9,31 @@ namespace LockSnap
     {
         private TextBlock messageTextBlock;
         private Image decryptedImageControl;
+        private Button encryptButton;
+        private Button decryptButton;
         private Dictionary<string, BitmapImage> decryptedImages;
         private int currentImageIndex;
 
-        public UIHandler(TextBlock messageTextBlock, Image decryptedImageControl)
+        public UIHandler(TextBlock messageTextBlock, Image decryptedImageControl, Button encryptButton, Button decryptButton)
         {
             this.messageTextBlock = messageTextBlock;
             this.decryptedImageControl = decryptedImageControl;
-            this.decryptedImages = new Dictionary<string, BitmapImage>();
-            this.currentImageIndex = 0;
+            this.encryptButton = encryptButton;
+            this.decryptButton = decryptButton;
         }
+
+        // UIHandler.cs
+        public void UpdateButtonStates(string selectedImagePath, string selectedFolderPath, bool isEncryption = true)
+        {
+            // Enable EncryptSplitButton if a standard image or folder is selected for encryption
+            encryptButton.IsEnabled = !string.IsNullOrEmpty(selectedImagePath) && isEncryption ||
+                                           !string.IsNullOrEmpty(selectedFolderPath) && isEncryption;
+
+            // Enable DecryptSplitButton if an encrypted file or folder is selected for decryption
+            decryptButton.IsEnabled = !string.IsNullOrEmpty(selectedImagePath) && !isEncryption ||
+                                           !string.IsNullOrEmpty(selectedFolderPath) && !isEncryption;
+        }
+
 
         public void SetDecryptedImages(Dictionary<string, BitmapImage> images, int startingIndex = 0)
         {
