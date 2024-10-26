@@ -31,8 +31,8 @@
             </SplitButton>
             <PasswordBox x:Name="PasswordBoxEncrypt" PlaceholderText="Enter Password" Width="200" ToolTipService.ToolTip="Enter a secure password for encryption."
                      HorizontalAlignment="Center" />
-            <Button Content="Encrypt Image/s" Click="OnEncryptButton_Click" Width="200" Background="#B56576" Foreground="White"
-                ToolTipService.ToolTip="Encrypt the selected image using the password." HorizontalAlignment="Center" />
+            <Button x:Name="EncryptButton" Content="Encrypt Image/s" Click="OnEncryptButton_Click" Width="200" Background="#B56576" Foreground="White"
+                ToolTipService.ToolTip="Encrypt the selected image using the password." HorizontalAlignment="Center" IsEnabled="False"/>
 
             <!-- Decryption Section -->
             <TextBlock Text="🔓 Decryption" FontSize="20" FontWeight="Bold" Foreground="#D3CCE3" TextAlignment="Center" Margin="20,30,20,0" />
@@ -47,8 +47,8 @@
             </SplitButton>
             <PasswordBox x:Name="PasswordBoxDecrypt" PlaceholderText="Enter Password" Width="200" ToolTipService.ToolTip="Enter the password used during encryption."
                      HorizontalAlignment="Center" />
-            <Button Content="Decrypt Image/s" Click="OnDecryptButton_Click" Width="200" Background="#B56576" Foreground="White"
-                ToolTipService.ToolTip="Decrypt the selected image file." HorizontalAlignment="Center" />
+            <Button x:Name="DecryptButton" Content="Decrypt Image/s" Click="OnDecryptButton_Click" Width="200" Background="#B56576" Foreground="White"
+                ToolTipService.ToolTip="Decrypt the selected image file." HorizontalAlignment="Center" IsEnabled="False"/>
         </StackPanel>
 
         <!-- Right side: Image viewer section -->

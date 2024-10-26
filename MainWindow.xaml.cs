@@ -24,21 +24,10 @@ namespace LockSnap
         {
             this.InitializeComponent();
             fileHandler = new FileHandler();
-            uiHandler = new UIHandler(MessageTextBlock, DecryptedImageControl);
+            uiHandler = new UIHandler(MessageTextBlock, DecryptedImageControl, EncryptButton, DecryptButton);
         }
 
         // Event Handlers
-
-        // Button: Select Image (Flyout)
-        private async void SelectImageFlyout_Click(object sender, RoutedEventArgs e)
-        {
-            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-            selectedImagePath = await fileHandler.SelectSingleImageAsync(hwnd);
-            if (!string.IsNullOrEmpty(selectedImagePath))
-            {
-                uiHandler.DisplayMessage("Image selected: " + selectedImagePath);
-            }
-        }
 
         // Button: Select Image (for SplitButton)
         private async void SelectImageButton_Click(SplitButton sender, SplitButtonClickEventArgs e)
@@ -48,6 +37,19 @@ namespace LockSnap
             if (!string.IsNullOrEmpty(selectedImagePath))
             {
                 uiHandler.DisplayMessage("Image selected: " + selectedImagePath);
+                uiHandler.UpdateButtonStates(selectedImagePath, selectedFolderPath, isEncryption: true);
+            }
+        }
+
+        // Button: Select Image (Flyout)
+        private async void SelectImageFlyout_Click(object sender, RoutedEventArgs e)
+        {
+            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            selectedImagePath = await fileHandler.SelectSingleImageAsync(hwnd);
+            if (!string.IsNullOrEmpty(selectedImagePath))
+            {
+                uiHandler.DisplayMessage("Image selected: " + selectedImagePath);
+                uiHandler.UpdateButtonStates(selectedImagePath, selectedFolderPath, isEncryption: true);
             }
         }
 
@@ -59,17 +61,7 @@ namespace LockSnap
             if (!string.IsNullOrEmpty(selectedFolderPath))
             {
                 uiHandler.DisplayMessage("Folder selected: " + selectedFolderPath);
-            }
-        }
-
-        // Button: Select Encrypted File (Flyout)
-        private async void SelectArtifactFlyout_Click(object sender, RoutedEventArgs e)
-        {
-            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-            selectedImagePath = await fileHandler.SelectEncryptedFileAsync(hwnd);
-            if (!string.IsNullOrEmpty(selectedImagePath))
-            {
-                uiHandler.DisplayMessage("Encrypted file selected: " + selectedImagePath);
+                uiHandler.UpdateButtonStates(selectedImagePath, selectedFolderPath, isEncryption: true);
             }
         }
 
@@ -81,6 +73,19 @@ namespace LockSnap
             if (!string.IsNullOrEmpty(selectedImagePath))
             {
                 uiHandler.DisplayMessage("Encrypted file selected: " + selectedImagePath);
+                uiHandler.UpdateButtonStates(selectedImagePath, selectedFolderPath, isEncryption: false);
+            }
+        }
+
+        // Button: Select Encrypted File (Flyout)
+        private async void SelectArtifactFlyout_Click(object sender, RoutedEventArgs e)
+        {
+            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            selectedImagePath = await fileHandler.SelectEncryptedFileAsync(hwnd);
+            if (!string.IsNullOrEmpty(selectedImagePath))
+            {
+                uiHandler.DisplayMessage("Encrypted file selected: " + selectedImagePath);
+                uiHandler.UpdateButtonStates(selectedImagePath, selectedFolderPath, isEncryption: false);
             }
         }
 
@@ -92,6 +97,7 @@ namespace LockSnap
             if (!string.IsNullOrEmpty(selectedFolderPath))
             {
                 uiHandler.DisplayMessage("Archive folder selected: " + selectedFolderPath);
+                uiHandler.UpdateButtonStates(selectedImagePath, selectedFolderPath, isEncryption: false);
             }
         }
 
