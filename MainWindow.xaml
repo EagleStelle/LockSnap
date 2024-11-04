@@ -2,104 +2,168 @@
     x:Class="LockSnap.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:LockSnap"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
     Title="LockSnap">
 
-    <Grid Background="#1F1A30">
-        <!-- Two-column layout: Left for encryption/decryption, Right for image viewer -->
+    <Grid Background="#1B1A2D">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <!-- Left side (auto-sized for content) -->
-            <ColumnDefinition Width="*" />
-            <!-- Right side for image viewer (takes all remaining space) -->
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Left side: Encryption and Decryption section -->
-        <StackPanel Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="15" Padding="10" Width="300">
-            <!-- Encryption Section -->
-            <TextBlock Text="🔒 Encryption" FontSize="20" FontWeight="Bold" Foreground="#D3CCE3" TextAlignment="Center" />
-            <!-- SplitButton for Encryption -->
-            <SplitButton Content="Select Image" Width="200" Background="#B56576" Foreground="White" HorizontalAlignment="Center"
-                         Click="SelectImageButton_Click">
-                <SplitButton.Flyout>
-                    <MenuFlyout>
-                        <MenuFlyoutItem Text="Select Image" Click="SelectImageFlyout_Click"/>
-                        <MenuFlyoutItem Text="Select Folder" Click="SelectDirectoryFlyout_Click"/>
-                    </MenuFlyout>
-                </SplitButton.Flyout>
-            </SplitButton>
-            <PasswordBox x:Name="PasswordBoxEncrypt" PlaceholderText="Enter Password" Width="200" ToolTipService.ToolTip="Enter a secure password for encryption."
+        <Grid.Resources>
+            <Style x:Key="CommonPanelStyle" TargetType="StackPanel">
+                <Setter Property="Visibility" Value="Collapsed" />
+                <Setter Property="Spacing" Value="5" />
+                <Setter Property="Padding" Value="10" />
+            </Style>
+        </Grid.Resources>
+
+        <!-- Custom Title Bar -->
+        <Grid Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="Top" Padding="10" x:Name="TitleBar">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Section with Hamburger, Icon, and App Name -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                <!-- Hamburger Menu -->
+                <Button x:Name="HamburgerButton" Width="50" Height="50" Margin="10,0" Background="Transparent">
+                    <SymbolIcon Symbol="GlobalNavigationButton"/>
+                </Button>
+
+                <!-- App Icon -->
+                <Image Source="Assets/icon_dashboard.png" Width="50" Height="50" Margin="0,0,10,0"/>
+
+                <!-- App Name -->
+                <TextBlock x:Name="ButtonText" Text="Lock Snap" FontSize="20" FontFamily="Bahnschrift" FontWeight="Bold" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Mode Button aligned to the right, next to window controls -->
+            <local:CustomButtonControl x:Name="ModeButton" IconSymbol="Manage" Text="Preview Mode"
+                                       Grid.Column="1"
+                                       HorizontalAlignment="Right"/>
+        </Grid>
+
+
+        <!-- First Layer - Main Vertical Menu -->
+        <Grid Grid.Row="1" Grid.Column="0" Width="{Binding ElementName=TitleBar, Path=Width}" Background="#2A2740" >
+            <StackPanel x:Name="ButtonStackPanel" Style="{StaticResource CommonPanelStyle}" Visibility="Visible">
+                <local:CustomButtonControl Tag="Panel0Control" IconSymbol="Import" Click="TogglePanel" Text="Browse"/>
+                <local:CustomButtonControl Tag="Panel1Control" IconSymbol="ProtectedDocument" Click="TogglePanel" Text="Encryption"/>
+                <local:CustomButtonControl Tag="Panel2Control" IconSymbol="OpenFile" Click="TogglePanel" Text="Decryption"/>
+                <local:CustomButtonControl Tag="Panel3Control" IconSymbol="Setting" Click="TogglePanel" Text="Settings"/>
+                <local:CustomButtonControl Tag="Panel4Control" IconSymbol="ContactInfo" Click="TogglePanel" Text="About"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Second Layer of StackPanels -->
+        <Grid Grid.Row="1" Grid.Column="1" Background="#5A4D9F">
+            <StackPanel x:Name="Panel0Control" Style="{StaticResource CommonPanelStyle}">
+                <local:CustomButtonControl x:Name="SelectImage" IconSymbol="BrowsePhotos" Text="Select Image/s"/>
+                <local:CustomButtonControl x:Name="SelectFolder" IconSymbol="NewFolder" Text="Select Folder"/>
+            </StackPanel>
+
+            <StackPanel x:Name="Panel1Control" Style="{StaticResource CommonPanelStyle}">
+                <local:CustomButtonControl x:Name="Encrypt" 
+                                           IconSymbol="Permissions" 
+                                           Text="Encrypt Current"/>
+                <local:CustomButtonControl x:Name="EncryptSelected" 
+                                           IconSymbol="Permissions" 
+                                           Text="Encrypt Selected"/>
+                <local:CustomButtonControl x:Name="EncryptAll" 
+                                           IconSymbol="Permissions" 
+                                           Text="Encrypt All"/>
+                <Rectangle Height="1" Fill="#3C3B5A" HorizontalAlignment="Stretch" Margin="0,10,0,10"/>
+                <PasswordBox x:Name="PasswordBoxEncrypt" PlaceholderText="Enter Password" Width="200" ToolTipService.ToolTip="Enter a secure password for encryption."
                      HorizontalAlignment="Center" />
-            <Button x:Name="EncryptButton" Content="Encrypt Image/s" Click="OnEncryptButton_Click" Width="200" Background="#B56576" Foreground="White"
-                ToolTipService.ToolTip="Encrypt the selected image using the password." HorizontalAlignment="Center" IsEnabled="False"/>
-
-            <!-- Decryption Section -->
-            <TextBlock Text="🔓 Decryption" FontSize="20" FontWeight="Bold" Foreground="#D3CCE3" TextAlignment="Center" Margin="20,30,20,0" />
-            <SplitButton Content="Select Image" Width="200" Background="#B56576" Foreground="White" HorizontalAlignment="Center"
-                         Click="SelectArtifactButton_Click">
-                <SplitButton.Flyout>
-                    <MenuFlyout>
-                        <MenuFlyoutItem Text="Select Image" Click="SelectArtifactFlyout_Click"/>
-                        <MenuFlyoutItem Text="Select Folder" Click="SelectArchiveFlyout_Click"/>
-                    </MenuFlyout>
-                </SplitButton.Flyout>
-            </SplitButton>
-            <PasswordBox x:Name="PasswordBoxDecrypt" PlaceholderText="Enter Password" Width="200" ToolTipService.ToolTip="Enter the password used during encryption."
+            </StackPanel>
+            
+            <StackPanel x:Name="Panel2Control" Style="{StaticResource CommonPanelStyle}">
+                <local:CustomButtonControl x:Name="Decrypt"
+                                           IconSymbol="Permissions" 
+                                           Text="Decrypt Current"/>
+                <local:CustomButtonControl x:Name="DecryptSelected" 
+                                           IconSymbol="Permissions" 
+                                           Text="Decrypt Selected"/>
+                <local:CustomButtonControl x:Name="DecryptAll" 
+                                           IconSymbol="Permissions" 
+                                           Text="Decrypt All"/>
+                <Rectangle Height="1" Fill="#3C3B5A" HorizontalAlignment="Stretch" Margin="0,10,0,10"/>
+                <PasswordBox x:Name="PasswordBoxDecrypt" PlaceholderText="Enter Password" Width="200" ToolTipService.ToolTip="Enter a secure password for encryption."
                      HorizontalAlignment="Center" />
-            <Button x:Name="DecryptButton" Content="Decrypt Image/s" Click="OnDecryptButton_Click" Width="200" Background="#B56576" Foreground="White"
-                ToolTipService.ToolTip="Decrypt the selected image file." HorizontalAlignment="Center" IsEnabled="False"/>
-        </StackPanel>
+            </StackPanel>
+            <StackPanel x:Name="Panel3Control" Style="{StaticResource CommonPanelStyle}">
+                <local:CustomButtonControl Text="Button A"/>
+            </StackPanel>
+            <StackPanel x:Name="Panel4Control" Style="{StaticResource CommonPanelStyle}">
+                <local:CustomButtonControl Text="Button A"/>
+            </StackPanel>
+        </Grid>
 
-        <!-- Right side: Image viewer section -->
-        <Grid Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="15">
-            <!-- Define rows for the title, image, and message box -->
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <!-- Image stretches to fill available space -->
-                <RowDefinition Height="Auto" />
-                <!-- Message box takes only needed space -->
-            </Grid.RowDefinitions>
+        <!-- Image display with background color and proper stretch -->
+        <Border Grid.Row="1" Grid.Column="2" x:Name="PreviewBorder">
+            <Grid Background="#3C3B5A">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <!-- Image display with background color and proper stretch -->
-            <Border Grid.Row="0" Background="#2B1B32">
-                <Grid>
-                    <Image x:Name="DecryptedImageControl" 
-                       Stretch="Uniform" 
-                       HorizontalAlignment="Center" 
+                <Image x:Name="ImageControl"
+                       Stretch="Uniform"
+                       HorizontalAlignment="Center"
                        VerticalAlignment="Center" />
 
-                    <!-- Previous Button on the left side -->
-                    <Button x:Name="PreviousButton"
-                            Content="❮"
-                            FontSize="38"
-                            Width="100"
-                            VerticalAlignment="Stretch"
-                            HorizontalAlignment="Left"
-                            Click="PreviousImage_Click"
-                            Foreground="#B56576"
-                            Opacity="0"
-                            PointerEntered="OnPointerEnteredButton"
-                            PointerExited="OnPointerExitedButton"/>
+                <!-- Previous Button on the left side -->
+                <Button x:Name="PreviousButton"
+                        Content="❮"
+                        FontSize="38"
+                        Width="100"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Left"
+                        Foreground="#B56576"
+                        Opacity="0"
+                        PointerEntered="OnPointerEnteredButton"
+                        PointerExited="OnPointerExitedButton"/>
 
-                    <!-- Next Button on the right side -->
-                    <Button x:Name="NextButton"
-                            Content="❯"
-                            FontSize="38"
-                            Width="100"
-                            VerticalAlignment="Stretch"
-                            HorizontalAlignment="Right"
-                            Click="NextImage_Click"
-                            Foreground="#B56576"
-                            Opacity="0"
-                            PointerEntered="OnPointerEnteredButton"
-                            PointerExited="OnPointerExitedButton"/>
+                <!-- Next Button on the right side -->
+                <Button x:Name="NextButton"
+                        Content="❯"
+                        FontSize="38"
+                        Width="100"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Right"
+                        Foreground="#B56576"
+                        Opacity="0"
+                        PointerEntered="OnPointerEnteredButton"
+                        PointerExited="OnPointerExitedButton"/>
 
-                </Grid>
-            </Border>
+                <!-- Combined message box for encryption and decryption statuses -->
+                <TextBlock Grid.Row="1" x:Name="MessageTextBlock" Text="" Foreground="#FF6F61" TextAlignment="Center" FontSize="14" FontWeight="SemiBold" Margin="20,10,20,0" />
+            </Grid>
+        </Border>
 
-            <!-- Combined message box for encryption and decryption statuses -->
-            <TextBlock Grid.Row="1" x:Name="MessageTextBlock" Text="" Foreground="#FF6F61" TextAlignment="Center" FontSize="14" FontWeight="SemiBold" Margin="20,10,20,0" />
-        </Grid>
+        <!-- Gallery Mode ScrollViewer with GridView -->
+        <ScrollViewer x:Name="GalleryScrollViewer" Grid.Row="1" Grid.Column="2" Visibility="Collapsed">
+            <GridView x:Name="GalleryGridView" Background="#3C3B5A">
+                <GridView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Width="150" Height="150" Margin="5">
+                            <Image Source="{Binding}" Stretch="UniformToFill" />
+                        </Grid>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+        </ScrollViewer>
     </Grid>
 </Window>
