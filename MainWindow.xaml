@@ -84,8 +84,7 @@
                                            Text="Encrypt Selected"/>
                 <local:CustomButtonControl x:Name="EncryptAll" 
                                            IconSymbol="Permissions" 
-                                           Text="Encrypt All"
-                                           Click="EncryptAllImages_Click"/>
+                                           Text="Encrypt All"/>
             </StackPanel>
             
             <StackPanel x:Name="Panel2Control" Style="{StaticResource CommonPanelStyle}">

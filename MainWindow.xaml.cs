@@ -191,8 +191,27 @@ namespace LockSnap
             if (_currentImageIndex >= 0 && _currentImageIndex < _loadedImages.Count)
             {
                 var currentFile = _loadedImages[_currentImageIndex];
-                BitmapImage image = await fileHandler.LoadImageFromFileAsync(currentFile);
-                ImageControl.Source = image;
+
+                // Access the password from the FileHandler instance
+                if (currentFile.FileType == ".enc" && !string.IsNullOrEmpty(fileHandler.DecryptionPassword))
+                {
+                    try
+                    {
+                        // Use the stored password for decryption
+                        BitmapImage decryptedImage = await fileHandler.LoadImageOrDecryptAsync(currentFile, fileHandler.DecryptionPassword);
+                        ImageControl.Source = decryptedImage;
+                    }
+                    catch (Exception ex)
+                    {
+                        await dialogHandler.ShowMessageAsync("Decryption Failed", ex.Message, this.Content.XamlRoot);
+                    }
+                }
+                else
+                {
+                    // Display the non-encrypted image
+                    BitmapImage image = await fileHandler.LoadImageFromFileAsync(currentFile);
+                    ImageControl.Source = image;
+                }
             }
         }
 
@@ -253,17 +272,17 @@ namespace LockSnap
         {
             if (_loadedImages.Count > 0 && _currentImageIndex >= 0)
             {
-                var password = await dialogHandler.ShowPasswordDialogAsync("Enter password to encrypt current image", this.Content.XamlRoot);
+                // Get the currently displayed image
+                var currentFile = _loadedImages[_currentImageIndex];
+
+                // Prompt for password
+                var password = await dialogHandler.ShowPasswordDialogAsync("Enter password to encrypt", this.Content.XamlRoot);
+
                 if (!string.IsNullOrEmpty(password))
                 {
-                    var file = _loadedImages[_currentImageIndex];
-                    var imagePath = file.Path;
-                    var encryptedPath = Path.Combine(Path.GetDirectoryName(imagePath), $"{Path.GetFileNameWithoutExtension(imagePath)}.enc");
-
-                    var encryptor = new ImageEncryptor(password);
-                    encryptor.EncryptImage(imagePath, encryptedPath);
-
-                    await dialogHandler.ShowMessageAsync("Encryption Successful", $"File encrypted and saved as {Path.GetFileName(encryptedPath)}", this.Content.XamlRoot);
+                    // Encrypt the current image
+                    fileHandler.EncryptImage(currentFile.Path, password);
+                    await dialogHandler.ShowMessageAsync("Encryption Successful", $"File encrypted successfully.", this.Content.XamlRoot);
                 }
             }
         }
