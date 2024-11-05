@@ -9,6 +9,12 @@ using WinRT.Interop;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Storage;
+using System.IO;
+using System.Security.Cryptography;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Windows.UI.Popups;
+using Windows.Storage.Streams;
+using System.Text;
 
 namespace LockSnap
 {
@@ -16,6 +22,7 @@ namespace LockSnap
     {
         // Handlers for file handling and encryption
         private FileHandler fileHandler;
+        private DialogHandler dialogHandler;
         private List<StorageFile> _loadedImages = new(); // Changed to StorageFile
         private int _currentImageIndex = -1;
 
@@ -31,7 +38,8 @@ namespace LockSnap
         public MainWindow()
         {
             this.InitializeComponent();
-            fileHandler = new FileHandler();
+            dialogHandler = new DialogHandler();
+            fileHandler = new FileHandler(this.Content.XamlRoot, dialogHandler);
             galleryHandler = new GalleryHandler(GalleryGridView); 
 
             // Attach event handlers for UI buttons
@@ -170,7 +178,7 @@ namespace LockSnap
         // Loads image/s selected by the user
         private async Task LoadImageAsync()
         {
-            await LoadAsync(() => fileHandler.SelectMultipleImagesAsync(GetWindowHandle()));
+            await LoadAsync(() => fileHandler.SelectMultipleImagesAsync(GetWindowHandle(), this.Content.XamlRoot));
         }
         // Loads all images from the selected folder
         private async Task LoadFolderAsync()
@@ -237,6 +245,26 @@ namespace LockSnap
                 GalleryScrollViewer.Visibility = Visibility.Collapsed;
                 PreviewBorder.Visibility = Visibility.Visible;
                 galleryHandler.UnloadImages();
+            }
+        }
+
+        // Encrypt current image
+        private async void EncryptCurrentImage_Click(object sender, RoutedEventArgs e)
+        {
+            if (_loadedImages.Count > 0 && _currentImageIndex >= 0)
+            {
+                var password = await dialogHandler.ShowPasswordDialogAsync("Enter password to encrypt current image", this.Content.XamlRoot);
+                if (!string.IsNullOrEmpty(password))
+                {
+                    var file = _loadedImages[_currentImageIndex];
+                    var imagePath = file.Path;
+                    var encryptedPath = Path.Combine(Path.GetDirectoryName(imagePath), $"{Path.GetFileNameWithoutExtension(imagePath)}.enc");
+
+                    var encryptor = new ImageEncryptor(password);
+                    encryptor.EncryptImage(imagePath, encryptedPath);
+
+                    await dialogHandler.ShowMessageAsync("Encryption Successful", $"File encrypted and saved as {Path.GetFileName(encryptedPath)}", this.Content.XamlRoot);
+                }
             }
         }
     }

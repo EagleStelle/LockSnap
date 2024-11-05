@@ -77,16 +77,15 @@
             <StackPanel x:Name="Panel1Control" Style="{StaticResource CommonPanelStyle}">
                 <local:CustomButtonControl x:Name="Encrypt" 
                                            IconSymbol="Permissions" 
-                                           Text="Encrypt Current"/>
+                                           Text="Encrypt Current"
+                                           Click="EncryptCurrentImage_Click"/>
                 <local:CustomButtonControl x:Name="EncryptSelected" 
                                            IconSymbol="Permissions" 
                                            Text="Encrypt Selected"/>
                 <local:CustomButtonControl x:Name="EncryptAll" 
                                            IconSymbol="Permissions" 
-                                           Text="Encrypt All"/>
-                <Rectangle Height="1" Fill="#3C3B5A" HorizontalAlignment="Stretch" Margin="0,10,0,10"/>
-                <PasswordBox x:Name="PasswordBoxEncrypt" PlaceholderText="Enter Password" Width="200" ToolTipService.ToolTip="Enter a secure password for encryption."
-                     HorizontalAlignment="Center" />
+                                           Text="Encrypt All"
+                                           Click="EncryptAllImages_Click"/>
             </StackPanel>
             
             <StackPanel x:Name="Panel2Control" Style="{StaticResource CommonPanelStyle}">
@@ -99,9 +98,6 @@
                 <local:CustomButtonControl x:Name="DecryptAll" 
                                            IconSymbol="Permissions" 
                                            Text="Decrypt All"/>
-                <Rectangle Height="1" Fill="#3C3B5A" HorizontalAlignment="Stretch" Margin="0,10,0,10"/>
-                <PasswordBox x:Name="PasswordBoxDecrypt" PlaceholderText="Enter Password" Width="200" ToolTipService.ToolTip="Enter a secure password for encryption."
-                     HorizontalAlignment="Center" />
             </StackPanel>
             <StackPanel x:Name="Panel3Control" Style="{StaticResource CommonPanelStyle}">
                 <local:CustomButtonControl Text="Button A"/>

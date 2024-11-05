@@ -1,24 +1,38 @@
 ﻿// FileHandler.cs
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using Windows.Storage.Streams;
 using Windows.UI.Popups;
 
 namespace LockSnap
 {
     internal class FileHandler
     {
+        private readonly XamlRoot _xamlRoot;
+        private readonly DialogHandler _dialogHandler;
+
         // Holds file references instead of fully loaded images, allowing on-demand loading
         private List<StorageFile> _imageFiles = new List<StorageFile>();
         private Dictionary<int, BitmapImage> _imageCache = new Dictionary<int, BitmapImage>();
         private const int CacheSize = 3; // Number of images to keep in memory
 
-        // Picks multiple images from file picker
-        public async Task<List<StorageFile>> SelectMultipleImagesAsync(IntPtr hwnd)
+        public FileHandler(XamlRoot xamlRoot, DialogHandler dialogHandler)
+        {
+            _xamlRoot = xamlRoot;
+            _dialogHandler = dialogHandler;
+        }
+
+        public async Task<List<StorageFile>> SelectMultipleImagesAsync(IntPtr hwnd, XamlRoot xamlRoot)
         {
             var openPicker = new FileOpenPicker
             {
@@ -32,21 +46,75 @@ namespace LockSnap
             WinRT.Interop.InitializeWithWindow.Initialize(openPicker, hwnd);
             var files = await openPicker.PickMultipleFilesAsync();
 
-            _imageFiles.Clear(); // Clear any previous selection
+            _imageFiles.Clear();
+            var encryptedFiles = new List<StorageFile>();
+
             foreach (var file in files)
             {
                 if (file.FileType == ".enc")
                 {
-                    var dialog = new MessageDialog("Enter the password for the encrypted file");
-                    await dialog.ShowAsync();
-                    // Handle decryption logic here, if required
+                    encryptedFiles.Add(file); // Store .enc files for batch decryption
                 }
                 else
                 {
-                    _imageFiles.Add(file); // Store file reference for later loading
+                    _imageFiles.Add(file); // Add regular image files directly
                 }
             }
+
+            if (encryptedFiles.Count > 0)
+            {
+                var password = await _dialogHandler.ShowPasswordDialogAsync("Enter password to decrypt selected .enc files", xamlRoot);
+
+                if (!string.IsNullOrEmpty(password))
+                {
+                    foreach (var encFile in encryptedFiles)
+                    {
+                        var decryptedFile = await DecryptFileAsync(encFile, password, xamlRoot);
+                        if (decryptedFile != null)
+                        {
+                            _imageFiles.Add(decryptedFile); // Add decrypted files to the list
+                        }
+                        else
+                        {
+                            await _dialogHandler.ShowMessageAsync("Decryption Failed", $"Failed to decrypt {encFile.Name}.", xamlRoot);
+                        }
+                    }
+                }
+                else
+                {
+                    await _dialogHandler.ShowMessageAsync("Decryption Cancelled", "No password entered. .enc files will not be loaded.", xamlRoot);
+                }
+            }
+
             return _imageFiles;
+        }
+
+        private async Task<StorageFile> DecryptFileAsync(StorageFile encryptedFile, string password)
+        {
+            try
+            {
+                // Instantiate the ImageEncryptor with the provided password
+                var decryptor = new ImageEncryptor(password);
+
+                // Decrypt the image and get the byte array of the decrypted data
+                byte[] decryptedData = decryptor.DecryptImageToBytes(encryptedFile.Path);
+
+                // Save the decrypted image data to a temporary file
+                var decryptedFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(
+                    $"{Path.GetFileNameWithoutExtension(encryptedFile.Name)}_Decrypted.png",
+                    CreationCollisionOption.ReplaceExisting);
+
+                // Write the decrypted data to the file
+                await FileIO.WriteBytesAsync(decryptedFile, decryptedData);
+
+                return decryptedFile;
+            }
+            catch (Exception ex)
+            {
+                // Show an error message if decryption fails
+                await _dialogHandler.ShowMessageAsync("Decryption Failed", $"Failed to decrypt {encryptedFile.Name}: {ex.Message}", _xamlRoot);
+                return null;
+            }
         }
 
         // Picks a folder and loads image references from it
