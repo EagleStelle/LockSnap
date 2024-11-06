@@ -276,7 +276,7 @@ namespace LockSnap
                 var currentFile = _loadedImages[_currentImageIndex];
 
                 // Prompt for password
-                var password = await dialogHandler.ShowPasswordDialogAsync("Enter password to encrypt", this.Content.XamlRoot);
+                var password = await dialogHandler.ShowPasswordDialogAsync("Enter password: ", this.Content.XamlRoot);
 
                 if (!string.IsNullOrEmpty(password))
                 {

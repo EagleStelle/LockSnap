@@ -65,7 +65,7 @@ namespace LockSnap
 
             if (encryptedFiles.Count > 0)
             {
-                DecryptionPassword = await _dialogHandler.ShowPasswordDialogAsync("Enter password to decrypt selected .enc files", xamlRoot);
+                DecryptionPassword = await _dialogHandler.ShowPasswordDialogAsync("Enter password: ", xamlRoot);
 
                 if (!string.IsNullOrEmpty(DecryptionPassword))
                 {
