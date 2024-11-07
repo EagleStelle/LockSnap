@@ -10,6 +10,7 @@ namespace LockSnap
     {
         private readonly string password;
 
+
         public ImageEncryptor(string password)
         {
             this.password = password;
